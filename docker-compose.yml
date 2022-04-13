@@ -1,0 +1,18 @@
+
+services:
+  db:
+    container_name: postgis_container
+    build: .
+    environment:
+      POSTGRES_DB: postgre
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+    - ./docker/db/data:/var/lib/postgresql/data
+    - ./docker/db/sql:/docker-entrypoint-initdb.d
+    - ./docker/db/sql:/sql
+    - ./docker/sample:/sample
+    - ./docker/osm:/gis/osm
+    - ./docker/pop_data:/gis/pop_data
+    ports:
+    - 5432:5432
