@@ -27,4 +27,5 @@ services:
     working_dir: '/root/'
     volumes:
     - ./work/ex2:/work/ex2
+    - ./work/python:/work/python
     tty: true
