@@ -29,3 +29,5 @@ RUN pip3 install --upgrade setuptools
 
 COPY ./python/requirements.txt .
 RUN pip3 install -r requirements.txt
+
+WORKDIR /work
