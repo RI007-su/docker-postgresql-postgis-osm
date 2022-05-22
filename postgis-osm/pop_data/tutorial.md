@@ -45,7 +45,7 @@ openstreetmapで取得し、データを入力してみよう。
 wget -P /work/data/osm --no-check-certificate https://download.geofabrik.de/asia/japan/kanto-latest.osm.pbf
 ```
 
-### 2,2 ファイルの権限変更
+### 2.2 ファイルの権限変更
 ```
 cd /work/data/osm
 chmod +x /work/data/osm/default.style
@@ -63,37 +63,44 @@ osm2pgsql --create --database=osm_kanto --slim --style=./default.style -U postgr
 
 ## 3. 人流データのインポート
 
-データはG空間情報センターより取得している。
-データ数が多いので、サンプルデータとして
-https://www.geospatial.jp/ckan/dataset/mlit-1km-fromto
-
+データは(G空間情報センター)[https://www.geospatial.jp/ckan/dataset/mlit-1km-fromto]より取得している。
+1km^2でかつ一月ごとの集計データが入手可能。
+データのダウンロードに時間がかかるので、すでに入手したものを`/work/data/pop_data`に`mesh1.zip`と`prefs.zip`をおいている。
+`mesh1.zip`には、1km^2のグリッドデータ`mesh1.shp`がふくまれており、人流データの各データの位置と範囲を規定している。
+`prefs.zip`には関東圏の1都6県の月別の人流データが格納されている。
+この講義では負荷軽減のため感染拡大前の2019年1月、東京・神奈川・埼玉・千葉で緊急事態宣言が発出された期間（2020/4/7-2020/5/21）におおよそあたる2020年4月の集計データのみを使用する。
 
 ### 3.1. meshデータ
-[サンプルデータ](https://drive.google.com/file/d/1PqhdZpRe3HFKoOnYXq3qclbFfjUFgdQl/view?usp=sharing)を入手し、中にある`mesh1.zip`を解凍し、`/work/data/pop_data`内に保存する。
+`mesh1.zip`を解凍する。
+
+```
+unzip mesh1.zip -d /work/data/pop_data/data
+```
+
 #### 3.1.1. sqlコマンドの作成
 shp2pgsqlでshpファイルをpostGISにインポートするためのsqlコマンドを作成する。
 
 ```sh
-shp2pgsql -D -I -s 4326 /work/data/pop_data/mesh1/mesh1.shp pop_mesh > /work/data/pop_data/mesh1.sql
+shp2pgsql -D -I -s 4326 /work/data/pop_data/data/mesh1/mesh1.shp pop_mesh > /work/data/pop_data/data/mesh1/mesh1.sql
 ```
 -D: ダンプ形式にする
 -I: 空間インデックスを作成
 -s: 座標系を定義（4326はespgコードで、WGS84）
-`/work/data/pop_data/mesh1/mesh1.shp`はがインポートするshpファイル
+`/work/data/pop_data/data/mesh1/mesh1.shp`はがインポートするshpファイル
 `pop_mesh`は追加するテーブル名
-`/work/data/pop_data/mesh1.sql`は変換するsqlコマンドが記載されたファイル
+`/work/data/pop_data/data/mesh1/mesh1.sql`は変換するsqlコマンドが記載されたファイル
 
 #### 3.1.2. DBへの追加
 1で作成したsqlコマンドを用いてgisdb DBへデータを追加する。
 
 ```sh
-psql -U postgres -d gisdb -f /work/data/pop_data/mesh1.sql
+psql -U postgres -d gisdb -f /work/data/pop_data/data/mesh1/mesh1.sql
 ```
 
 ### 3.2. 人流データ(csv)のインポート
 一月ごとの集計データが入手可能。
-[サンプルデータ](https://drive.google.com/file/d/1PqhdZpRe3HFKoOnYXq3qclbFfjUFgdQl/view?usp=sharing)を入手し、中にある`prefs.zip`を解凍し、`/work/data/pop_data`内に保存する。
-この講義では負荷軽減のため2019年1月、2020年1月の集計データのみを使用する。
+`prefs.zip`には、関東圏の1都6県の月別の人流データが格納されている。
+この講義では負荷軽減のため2019年1月、2020年4月の集計データのみを使用する。
 
 #### 3.2.1. gisdbにアクセス
 ```
@@ -114,15 +121,20 @@ CREATE TABLE "pop" (
 );
 
 ```
+テーブルを作成したらデータベースから抜ける。
+```sql
+\q
+```
 #### 3.2.3. csvデータのインポート
-`pop_data`には1都6県の月別人流データが別々にzipで固まっている。
+`pop_data`には1都6県の月別人流データが含まれている。
 zipを解凍してcsvファイルを取り出し、かつpostgresqlにインポートするためのsqlコマンドを作成するshellスクリプト（`copy_csv.sh`）を作成し、`/work/data/pop_data`に配置する。
 
 
 ```sh
 #!/bin/sh
+unzip /work/data/pop_data/data/prefs.zip -d /work/data/pop_data/data
 
-for entry in /work/data/pop_data/prefs/*/*/*/*.zip
+for entry in /work/data/pop_data/data/prefs/*/*/*/*.zip
 do
   datapath=`echo $(dirname $entry)`
   unzip -o $entry -d $datapath
@@ -131,10 +143,6 @@ do
   echo "COPY pop FROM '$csvname' with (format csv, header true, null '', force_null(population));" >> /work/data/pop_data/copy_csv.sql
 done
 
-```
-`copy_csv.sh`を実行する。
-```sh
-sh /work/data/pop_data/copy_csv.sh
 ```
 
 `copy_csv.sql`を実行する.
@@ -159,13 +167,24 @@ SELECT p.name, d.prefcode, d.year, d.month, d.population, p.geom FROM pop AS d I
 
 #### 3.2.5. レコード数のチェック
 上記の問い合わせ処理のビューを作成してみる。
+まずgisdbに接続する。
+```
+psql -U postgres -d gisdb
+```
+SQLで2020, 2021年のデータ休日昼間のviewを作成する。
  ```sql
 
 CREATE VIEW pop201901 AS SELECT p.name, d.prefcode, d.year, d.month, d.population, p.geom FROM pop AS d INNER JOIN pop_mesh AS p ON p.name = d.mesh1kmid WHERE d.dayflag='0' AND d.timezone='0' AND d.year='2019';
 
+CREATE VIEW pop202004 AS SELECT p.name, d.prefcode, d.year, d.month, d.population, p.geom FROM pop AS d INNER JOIN pop_mesh AS p ON p.name = d.mesh1kmid WHERE d.dayflag='0' AND d.timezone='0' AND d.year='2020';
 ```
 
 ```sql
 select count(name) from pop_mesh;
 select count(name) from pop201901;
+select count(name) from pop202004;
 ```
+
+## References
+- 「全国の人流オープンデータ」（国土交通省）（https://www.geospatial.jp/ ckan/dataset/mlit-1km-fromto）
+- （緊急事態宣言 1回目の状況」（NHK）(https://www3.nhk.or.jp/news/special/coronavirus/emergency/)

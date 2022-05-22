@@ -21,7 +21,9 @@ services:
 
   python:
     container_name: python_container
-    image: rsnaru/docker-python4postgis:latest
+    build:
+      context: .
+      dockerfile: ./python/Dockerfile
     working_dir: '/root/'
     volumes:
     - ./work/ex2:/work/ex2
