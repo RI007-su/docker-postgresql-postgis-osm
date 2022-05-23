@@ -56,7 +56,7 @@ chmod +x /work/data/osm/kanto-latest.osm.pbf
 [osm data](http://download.geofabrik.de/asia/japan.html)と[default.style](https://learnosm.org/files/default.style)のあるディレクトリ `/work/data/osm` をカレントディレクトリとし、以下を実行する。
 
 ```sh
-osm2pgsql --create --database=osm_kanto --slim --style=./default.style -U postgres -H localhost ./kanto-latest.osm.pbf
+osm2pgsql --create --database=gisdb --slim --style=./default.style -U postgres -H localhost ./kanto-latest.osm.pbf
 ```
 （注意）かなり時間がかかります。
 

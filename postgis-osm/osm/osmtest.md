@@ -1,12 +1,12 @@
 # 1. create db
 At terminal
 ```
-createdb -U postgres osm_kanto
+createdb -U postgres gisdb
 ```
 # 2. connect to db
 At terminal
 ```
-psql -U postgres osm_kanto
+psql -U postgres gisdb
 ```
 # 3. activate postgis extension
 ```
@@ -32,7 +32,7 @@ chmod +x /work/data/osm/kanto-latest.osm.pbf
 # 6. create table schema
 At working directory (`/work/data/osm`)where [osm data](http://download.geofabrik.de/asia/japan.html) and [default.style](https://learnosm.org/files/default.style) are located:
 ```
-osm2pgsql --create --database=osm_kanto --slim --style=./default.style -U postgres -H localhost ./kanto-latest.osm.pbf
+osm2pgsql --create --database=gisdb --slim --style=./default.style -U postgres -H localhost ./kanto-latest.osm.pbf
 ```
 # 7. wait & wait & wait
 

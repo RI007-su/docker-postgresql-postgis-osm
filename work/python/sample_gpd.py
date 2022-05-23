@@ -2,11 +2,11 @@ import os
 from sqlalchemy import create_engine
 import geopandas as gpd
 
-def query_geopandas(table):
-    DATABASE_URL='postgresql://postgres:postgres@postgis_container:5432/gisdb'
+def query_geopandas(db):
+    DATABASE_URL='postgresql://postgres:postgres@postgis_container:5432/{}'.format(db)
     conn = create_engine(DATABASE_URL)
 
-    sql = "select * from {} limit 3;".format(table)
+    sql = "select * from adm2 limit 3;"
 
     query_result_gdf = gpd.GeoDataFrame.from_postgis(
         sql, conn, geom_col='geom')
@@ -15,7 +15,7 @@ def query_geopandas(table):
 
 def main():
 
-    out = query_geopandas('adm2') #specify table name
+    out = query_geopandas('gisdb') #specify db name
     print(out)
 
 if __name__ == '__main__':
