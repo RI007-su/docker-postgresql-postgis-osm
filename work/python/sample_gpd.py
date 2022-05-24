@@ -9,7 +9,7 @@ def query_geopandas(db):
     sql = "select * from adm2 limit 3;"
 
     query_result_gdf = gpd.GeoDataFrame.from_postgis(
-        sql, conn, geom_col='geom')
+        sql, conn, geom_col='geom') #geom_col='way' when using osm_kanto, geom_col='geom' when using gisdb
     return query_result_gdf
 
 
