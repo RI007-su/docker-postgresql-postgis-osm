@@ -5,7 +5,6 @@
 - DockerとVScodeのインストール
 - Docker Extensionのインストール
 - [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)  のインストール
-- 任意の作業ディレクトリの作成
 
 ## 起動
 VScodeを立ち上げ、作業ディレクトリ内で以下をTerminalで実行する。　
