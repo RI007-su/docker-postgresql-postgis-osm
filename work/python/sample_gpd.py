@@ -1,6 +1,8 @@
 import os
 from sqlalchemy import create_engine
+import pandas as pd
 import geopandas as gpd
+pd.set_option('display.max_columns', 100)
 
 def query_geopandas(db):
     DATABASE_URL='postgresql://postgres:postgres@postgis_container:5432/{}'.format(db)

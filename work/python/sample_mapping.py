@@ -2,6 +2,7 @@ import os
 from sqlalchemy import create_engine
 import geopandas as gpd
 import matplotlib.pyplot as plt
+pd.set_option('display.max_columns', 100)
 
 def query_geopandas(db):
     DATABASE_URL='postgresql://postgres:postgres@postgis_container:5432/{}'.format(db)
@@ -22,7 +23,7 @@ def main():
     #mapping
     #mapping options: https://geopandas.org/en/stable/docs/user_guide/mapping.html
     fig, ax = plt.subplots(1, 1)
-    #out.plot(ax=ax)
+    out.plot(ax=ax)
 
     #updating map
     #out.plot(column='population', ax=ax, legend=True, cmap='OrRd', scheme='quantiles')
