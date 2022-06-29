@@ -1,5 +1,6 @@
 import os
 from sqlalchemy import create_engine
+import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 pd.set_option('display.max_columns', 100)
