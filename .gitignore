@@ -2,3 +2,4 @@
 docker/db/data
 docker/sample/*.sql
 docker/db/*
+postgis-osm/*
