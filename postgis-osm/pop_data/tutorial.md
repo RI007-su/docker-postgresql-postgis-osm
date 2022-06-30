@@ -144,8 +144,12 @@ do
 done
 
 ```
+作成したシェルを実行する．
+```sh
+sh ./copy_csv.sh
+```
 
-`copy_csv.sql`を実行する.
+このシェルで作られた`copy_csv.sql`を実行してDBにデータをインポートする.
 ```sh
 psql -U postgres -d gisdb -f /work/data/pop_data/copy_csv.sql
 ```
@@ -160,7 +164,7 @@ psql -U postgres -d gisdb -f /work/data/pop_data/copy_csv.sql
 ここでは2019年1月の休日・昼を考えてみよう。
 
 以下をQGISのDB Managerで実行する。
-```
+```sql
 SELECT p.name, d.prefcode, d.year, d.month, d.population, p.geom FROM pop AS d INNER JOIN pop_mesh AS p ON p.name = d.mesh1kmid WHERE d.dayflag='0' AND d.timezone='0' AND d.year='2019';
 
 ```
