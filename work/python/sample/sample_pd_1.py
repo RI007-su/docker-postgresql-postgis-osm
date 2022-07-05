@@ -7,7 +7,7 @@ def query_pandas(db):
     DATABASE_URL='postgresql://postgres:postgres@postgis_container:5432/{}'.format(db)
     conn = create_engine(DATABASE_URL)
 
-    # adm2データをのぞく
+    # adm2データをチェックする
     sql = "select * from adm2 limit 3;"
     print(sql)
 
